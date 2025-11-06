@@ -14,13 +14,13 @@ const db = require('./db-connector');
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 app.use(express.urlencoded({ extended: true }));
 
 
 // Link page to URLs
 app.get('/', (req, res) => {
-    res.render('index', {
+    res.render('home', {
         title: 'Rocket Event Management',
         pages: [
             { url: '/students', name: 'Browse Students' },
