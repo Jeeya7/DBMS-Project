@@ -1,0 +1,12 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment / secrets
+.env
+activity2/db-connector.js
+
+# Editor/OS
+.vscode/
+.DS_Store
