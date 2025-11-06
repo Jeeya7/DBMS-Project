@@ -7,12 +7,14 @@
     "development": "npx nodemon app.js",
     "production": "npx forever start app.js",
     "stop_production": "npx forever stop app.js"
-},
+  },
   "author": "Jiya Pradhan & Faith Nambasa",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "forever": "^4.0.3",
+    "hbs": "^4.2.0",
     "mysql2": "^3.15.3",
     "nodemon": "^3.1.10"
   }
