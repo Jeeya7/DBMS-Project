@@ -65,7 +65,27 @@ app.get('/students', (req, res) => {
 });
 
 app.get('/departments', (req, res) => res.render('departments'));
-app.get('/events', (req, res) => res.render('events'));
+app.get('/events', (req, res) => {
+
+    const sql = 'SELECT * FROM Events;';
+
+    // support both exports: db.pool.query(...) or db.query(...)
+    const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+    if (!executor || typeof executor.query !== 'function') {
+        console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+        return res.status(500).render('events', { events: [], error: 'Database not configured' });
+    }
+
+    executor.query(sql, (error, results) => {
+        if (error) {
+            console.error('DB error fetching events:', error);
+            return res.status(500).render('events', { events: [], error: error.message });
+        }
+        res.render('events', { events: results });
+    });
+});
+
 app.get('/locations', (req, res) => res.render('locations'));
 app.get('/event-attendance', (req, res) => res.render('events-with-students'));
 app.get('/department-events', (req, res) => res.render('departments-with-students'));

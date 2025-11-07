@@ -2,7 +2,7 @@
 
 <p>This page will allow viewing and managing campus events.</p>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Event ID</th>
@@ -15,7 +15,21 @@
     </tr>
   </thead>
   <tbody>
-    <tr><td colspan="7">No event data yet.</td></tr>
+    {{#if events.length}}
+      {{#each events}}
+        <tr>
+          <td>{{this.eventId}}</td>
+          <td>{{this.name}}</td>
+          <td>{{this.date}}</td>
+          <td>{{this.startTime}}</td>
+          <td>{{this.expectedAttendance}}</td>
+          <td>{{this.location}}</td>
+          <td><button>Delete</button></td>
+        </tr>
+      {{/each}}
+    {{else}}
+      <tr><td colspan="7">No event data yet.</td></tr>
+    {{/if}}
   </tbody>
 </table>
 
