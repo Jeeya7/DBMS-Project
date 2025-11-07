@@ -2,7 +2,7 @@
 
 <p>This page will show which students attended which events.</p>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Event</th>
@@ -10,6 +10,15 @@
     </tr>
   </thead>
   <tbody>
+    {{#if events-with-students.length}}
+      {{#each events-with-students}}
+        <tr>
+          <td>{{this.Events_eventId}}</td>
+          <td>{{this.Students_studentId}}</td>
+        </tr>
+      {{/each}}
+    {{else}}
     <tr><td colspan="2">No data yet.</td></tr>
+    {{/if}}
   </tbody>
 </table>
