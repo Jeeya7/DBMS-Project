@@ -1,20 +1,20 @@
-<h1>Events With Students</h1>
+<h1>Departments With Events</h1>
 
-<p>This page will show which students attended which events.</p>
+<p>This page will show which events belong to each department.</p>
 
 <table class="table">
   <thead>
     <tr>
-      <th>Event</th>
-      <th>Student</th>
+      <th>Department</th>
+      <th>Event Name</th>
     </tr>
   </thead>
   <tbody>
     {{#if events.length}}
       {{#each events}}
         <tr>
+          <td>{{this.Departments_departmentId}}</td>
           <td>{{this.Events_eventId}}</td>
-          <td>{{this.Students_studentId}}</td>
         </tr>
       {{/each}}
     {{else}}

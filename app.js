@@ -124,8 +124,42 @@ app.get('/locations', (req, res) => {
 });
 
 
-app.get('/event-attendance', (req, res) => res.render('events-with-students'));
-app.get('/department-events', (req, res) => res.render('departments-with-students'));
+app.get('/event-attendance', (req, res) =>
+{
+    const sql = 'SELECT * FROM Events_has_Students;';
+    const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+    if (!executor || typeof executor.query !== 'function') {
+        console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+        return res.status(500).render('events-with-students', { events: [], error: 'Database not configured' });
+    }
+
+    executor.query(sql, (error, results) => {
+        if (error) {
+            console.error('DB error fetching event attendance:', error);
+            return res.status(500).render('events-with-students', { events: [], error: error.message });
+        }
+        res.render('events-with-students', { events: results });
+    });
+});
+
+app.get('/department-events', (req, res) => {
+    const sql = 'SELECT * FROM Departments_has_Events;';
+    const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+    if (!executor || typeof executor.query !== 'function') {
+        console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+        return res.status(500).render('departments-with-events', { events: [], error: 'Database not configured' });
+    }
+
+    executor.query(sql, (error, results) => {
+        if (error) {
+            console.error('DB error fetching department events:', error);
+            return res.status(500).render('departments-with-events', { events: [], error: error.message });
+        }
+        res.render('departments-with-events', { events: results });
+    });
+});
 
 
 /*
