@@ -1,6 +1,7 @@
 // Get an instance of mysql we can use in the app
 require('dotenv').config();
 let mysql = require('mysql2')
+
 // Create a connection to the database
 let pool = mysql.createPool({
   host: process.env.DB_HOST,

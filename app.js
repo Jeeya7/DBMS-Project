@@ -39,27 +39,17 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
     res.render('home', {
         title: 'Rocket Event Management',
-        layout: 'main',    // explicitly use views/layouts/main.hbs
-        pages: [
-            { url: '/students', name: 'Browse Students', description: 'View list of students' },
-            { url: '/departments', name: 'Browse Departments', description: 'View list of departments' },
-            { url: '/events', name: 'Browse Events', description: 'View list of events' },
-            { url: '/locations', name: 'Browse Locations', description: 'View locations' },
-            { url: '/departments-with-students', name: 'Departments with Students', description: 'Departments and their students' },
-            { url: '/events-with-students', name: 'Events with Students', description: 'Events with attending students' }
-        ]
+        layout: 'main'    // explicitly use views/layouts/main.hbs
     });
 });
 
-/*
-    UI PAGES FOR EACH TABLE
-*/
+// UI PAGES FOR EACH TABLE
 app.get('/students', (req, res) => res.render('students'));
 app.get('/departments', (req, res) => res.render('departments'));
 app.get('/events', (req, res) => res.render('events'));
 app.get('/locations', (req, res) => res.render('locations'));
-app.get('/event-attendance', (req, res) => res.render('event-attendance'));
-app.get('/department-events', (req, res) => res.render('department-events'));
+app.get('/event-attendance', (req, res) => res.render('events-with-students'));
+app.get('/department-events', (req, res) => res.render('departments-with-students'));
 
 
 /*
