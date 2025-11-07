@@ -2,7 +2,7 @@
 
 <p>This page will allow managing campus event locations.</p>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Location ID</th>
@@ -13,7 +13,22 @@
     </tr>
   </thead>
   <tbody>
-    <tr><td colspan="5">No location data yet.</td></tr>
+
+    {{#if locations.length}}
+    {{#each locations}}
+    <tr>
+      <td>{{this.locationId}}</td>
+      <td>{{this.locationName}}</td>
+      <td>{{this.address}}</td>
+      <td>{{this.capacity}}</td>
+    </tr>
+    {{/each}}
+    {{else}}
+    <tr>
+      <td colspan="3">No department data yet.</td>
+    </tr>
+    {{/if}}
+
   </tbody>
 </table>
 

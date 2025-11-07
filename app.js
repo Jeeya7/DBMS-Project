@@ -104,10 +104,26 @@ app.get('/events', (req, res) => {
 });
 
 app.get('/locations', (req, res) => {
-  
-}
-  
-  res.render('locations'));
+  const sql = 'SELECT * FROM Locations;';
+
+  // support both exports: db.pool.query(...) or db.query(...)
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  if (!executor || typeof executor.query !== 'function') {
+    console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+    return res.status(500).render('locations', { locations: [], error: 'Database not configured' });
+  }
+
+  executor.query(sql, (error, results) => {
+    if (error) {
+      console.error('DB error fetching locations:', error);
+      return res.status(500).render('locations', { locations: [], error: error.message });
+    }
+    res.render('locations', { locations: results });
+  });
+});
+
+
 app.get('/event-attendance', (req, res) => res.render('events-with-students'));
 app.get('/department-events', (req, res) => res.render('departments-with-students'));
 
