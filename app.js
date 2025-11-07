@@ -5,14 +5,25 @@
 // Express Server
 const express = require('express');  // We are using the express library for the web server
 const app = express();               // We need to instantiate an express object to interact with the server in our code
-const PORT = process.env.PORT || 2222;                   // Set a port number
+const PORT = process.env.PORT || 1738;                   // Set a port number
 const path = require('path');
 // Database connection
 const db = require('./db-connector');
 
 // Configure handlebars
+// Handlebars Setup
+const { engine } = require('express-handlebars');
+
+app.engine('hbs', engine({
+    extname: '.hbs',
+    defaultLayout: 'main',
+    layoutsDir: path.join(__dirname, 'views/layouts'),
+    partialsDir: path.join(__dirname, 'views/partials')
+}));
+
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
+
 
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 app.use(express.urlencoded({ extended: true }));
@@ -39,6 +50,16 @@ app.get('/', (req, res) => {
         ]
     });
 });
+
+/*
+    UI PAGES FOR EACH TABLE
+*/
+app.get('/students', (req, res) => res.render('students'));
+app.get('/departments', (req, res) => res.render('departments'));
+app.get('/events', (req, res) => res.render('events'));
+app.get('/locations', (req, res) => res.render('locations'));
+app.get('/event-attendance', (req, res) => res.render('event-attendance'));
+app.get('/department-events', (req, res) => res.render('department-events'));
 
 
 /*
