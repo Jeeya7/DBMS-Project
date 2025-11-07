@@ -10,12 +10,22 @@
       <th>Last Name</th>
       <th>Email</th>
       <th>Department</th>
-      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
-    {{!-- Data will go here in Step 4 --}}
-    <tr><td colspan="6">No student data yet.</td></tr>
+    {{#if students.length}}
+      {{#each students}}
+        <tr>
+          <td>{{this.studentId}}</td>
+          <td>{{this.firstName}}</td>
+          <td>{{this.lastName}}</td>
+          <td>{{this.email}}</td>
+          <td>{{this.Departments_departmentId}}</td>
+        </tr>
+      {{/each}}
+    {{else}}
+    <tr><td colspan="5">No student data yet.</td></tr>
+    {{/if}}
   </tbody>
 </table>
 
