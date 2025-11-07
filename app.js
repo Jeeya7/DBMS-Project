@@ -13,6 +13,7 @@ const db = require('./db-connector');
 // Configure handlebars
 // Handlebars Setup
 const { engine } = require('express-handlebars');
+const { error } = require('console');
 
 app.engine('hbs', engine({
     extname: '.hbs',
@@ -64,7 +65,24 @@ app.get('/students', (req, res) => {
   });
 });
 
-app.get('/departments', (req, res) => res.render('departments'));
+app.get('/departments', (req, res) => {
+  const sql = 'SELECT * FROM Departments;';
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  if (!executor || typeof executor.query !== 'function') {
+    console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+    return res.status(500).render('departments', { departments: [], error: error.message });
+  }
+  
+  executor.query(sql, (error, results) => {
+    if (error) {
+      console.error('DB error fetching departments:', error);
+      return res.status(500).render('departments', { departments: [], error: error.message });
+    }
+    res.render('departments', { departments: results });
+  });
+});
+  
 app.get('/events', (req, res) => {
 
     const sql = 'SELECT * FROM Events;';
