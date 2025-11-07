@@ -2,8 +2,8 @@
 
 <p>This page will allow viewing, adding, editing, and deleting student records.</p>
 
-<table>
-  <thead>
+<table class="table">
+  <thead class="table-head">
     <tr>
       <th>Student ID</th>
       <th>First Name</th>
@@ -12,7 +12,7 @@
       <th>Department</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="table-body">
     {{#if students.length}}
       {{#each students}}
         <tr>
