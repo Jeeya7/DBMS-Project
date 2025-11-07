@@ -13,13 +13,12 @@ const db = require('./db-connector');
 // Configure handlebars
 // Handlebars Setup
 const { engine } = require('express-handlebars');
-const { error } = require('console');
 
 app.engine('hbs', engine({
-    extname: '.hbs',
-    defaultLayout: 'main',
-    layoutsDir: path.join(__dirname, 'views/layouts'),
-    partialsDir: path.join(__dirname, 'views/partials')
+  extname: '.hbs',
+  defaultLayout: 'main',
+  layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials')
 }));
 
 app.set('view engine', 'hbs');
@@ -38,10 +37,10 @@ app.use((req, res, next) => {
 
 // Link page to URLs
 app.get('/', (req, res) => {
-    res.render('home', {
-        title: 'Rocket Event Management',
-        layout: 'main'    // explicitly use views/layouts/main.hbs
-    });
+  res.render('home', {
+    title: 'Rocket Event Management',
+    layout: 'main'    // explicitly use views/layouts/main.hbs
+  });
 });
 
 // UI PAGES FOR EACH TABLE
@@ -71,9 +70,9 @@ app.get('/departments', (req, res) => {
 
   if (!executor || typeof executor.query !== 'function') {
     console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
-    return res.status(500).render('departments', { departments: [], error: error.message });
+    return res.status(500).render('departments', { departments: [], error: 'Database not configured' });
   }
-  
+
   executor.query(sql, (error, results) => {
     if (error) {
       console.error('DB error fetching departments:', error);
@@ -82,29 +81,33 @@ app.get('/departments', (req, res) => {
     res.render('departments', { departments: results });
   });
 });
-  
+
 app.get('/events', (req, res) => {
 
-    const sql = 'SELECT * FROM Events;';
+  const sql = 'SELECT * FROM Events;';
 
-    // support both exports: db.pool.query(...) or db.query(...)
-    const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  // support both exports: db.pool.query(...) or db.query(...)
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
-    if (!executor || typeof executor.query !== 'function') {
-        console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
-        return res.status(500).render('events', { events: [], error: 'Database not configured' });
+  if (!executor || typeof executor.query !== 'function') {
+    console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+    return res.status(500).render('events', { events: [], error: 'Database not configured' });
+  }
+
+  executor.query(sql, (error, results) => {
+    if (error) {
+      console.error('DB error fetching events:', error);
+      return res.status(500).render('events', { events: [], error: error.message });
     }
-
-    executor.query(sql, (error, results) => {
-        if (error) {
-            console.error('DB error fetching events:', error);
-            return res.status(500).render('events', { events: [], error: error.message });
-        }
-        res.render('events', { events: results });
-    });
+    res.render('events', { events: results });
+  });
 });
 
-app.get('/locations', (req, res) => res.render('locations'));
+app.get('/locations', (req, res) => {
+  
+}
+  
+  res.render('locations'));
 app.get('/event-attendance', (req, res) => res.render('events-with-students'));
 app.get('/department-events', (req, res) => res.render('departments-with-students'));
 
@@ -113,6 +116,6 @@ app.get('/department-events', (req, res) => res.render('departments-with-student
     LISTENER
 */
 
-app.listen(PORT, function(){            // This is the basic syntax for what is called the 'listener' which receives incoming requests on the specified PORT.
-    console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
+app.listen(PORT, function () {            // This is the basic syntax for what is called the 'listener' which receives incoming requests on the specified PORT.
+  console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
 });

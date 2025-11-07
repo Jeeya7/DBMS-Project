@@ -12,17 +12,18 @@
   </thead>
   <tbody>
 
-     {{#if departmetns.length}}
-      {{#each departments}}
-        <tr>
-          <td>{{this.departmentId}}</td>
-          <td>{{this.departmentName}}</td>
-        </tr>
-      {{/each}}
+    {{#if departments.length}}
+    {{#each departments}}
+    <tr>
+      <td>{{this.departmentId}}</td>
+      <td>{{this.departmentName}}</td>
+    </tr>
+    {{/each}}
     {{else}}
-    <tr><td colspan="5">No student data yet.</td></tr>
+    <tr>
+      <td colspan="3">No department data yet.</td>
+    </tr>
     {{/if}}
-    <tr><td colspan="3">No department data yet.</td></tr>
   </tbody>
 </table>
 
