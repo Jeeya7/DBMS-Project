@@ -38,26 +38,63 @@
   </tbody>
 </table>
 
+
 <h3>Update Event Details</h3>
+
 <form action="/update-event" method="POST" class="update-form">
-  <label for="eventId">Event ID:</label>
-  <input type="number" id="eventId" name="eventId" required>
+  <!-- 1️⃣ Select Event by ID -->
+  <label for="eventId">Select Event ID:</label>
+  <select id="eventId" name="eventId" required>
+    <option value="">-- Select an Event ID --</option>
+    {{#each events}}
+      <option 
+        value="{{this.eventId}}" 
+        data-name="{{this.eventName}}" 
+        data-date="{{this.eventDate}}" 
+        data-start="{{this.startTime}}" 
+        data-attendance="{{this.expectedAttendance}}" 
+        data-location="{{this.Locations_locationId}}">
+        {{this.eventId}} — {{this.eventName}}
+      </option>
+    {{/each}}
+  </select>
 
-  <label for="eventName">New Event Name:</label>
-  <input type="text" id="eventName" name="eventName" placeholder="Enter new event name">
+  <!-- 2️⃣ Autofilled fields -->
+  <label for="eventName">Event Name:</label>
+  <input type="text" id="eventName" name="eventName" placeholder="Enter new name">
 
-  <label for="eventDate">New Date:</label>
+  <label for="eventDate">Event Date:</label>
   <input type="date" id="eventDate" name="eventDate">
 
-  <label for="startTime">New Start Time:</label>
+  <label for="startTime">Start Time:</label>
   <input type="time" id="startTime" name="startTime">
 
-  <label for="expectedAttendance">New Expected Attendance:</label>
+  <label for="expectedAttendance">Expected Attendance:</label>
   <input type="number" id="expectedAttendance" name="expectedAttendance" placeholder="e.g. 150">
 
-  <label for="locationId">New Location ID:</label>
+  <label for="locationId">Location ID:</label>
   <input type="number" id="locationId" name="locationId" placeholder="e.g. 2">
 
   <button type="submit">Update Event</button>
 </form>
-<button>Add Event</button>
+
+<script>
+  // when user selects an event ID
+  document.getElementById('eventId').addEventListener('change', function () {
+    const selected = this.options[this.selectedIndex];
+
+    // read data attributes
+    const name = selected.getAttribute('data-name');
+    const date = selected.getAttribute('data-date');
+    const start = selected.getAttribute('data-start');
+    const attendance = selected.getAttribute('data-attendance');
+    const location = selected.getAttribute('data-location');
+
+    // fill corresponding fields
+    document.getElementById('eventName').value = name || '';
+    document.getElementById('eventDate').value = date ? date.split('T')[0] : ''; // strip time if needed
+    document.getElementById('startTime').value = start || '';
+    document.getElementById('expectedAttendance').value = attendance || '';
+    document.getElementById('locationId').value = location || '';
+  });
+</script>

@@ -161,6 +161,34 @@ app.get('/department-events', (req, res) => {
     });
 });
 
+app.post('/update-event', (req, res) => {
+  const { eventId, eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
+
+  const sql = `
+    UPDATE Events
+    SET 
+      eventName = ?, 
+      eventDate = ?, 
+      startTime = ?, 
+      expectedAttendance = ?, 
+      Locations_locationId = ?
+    WHERE eventId = ?;
+  `;
+
+  const params = [eventName, eventDate, startTime, expectedAttendance, locationId, eventId];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err, result) => {
+    if (err) {
+      console.error('❌ Error updating event:', err);
+      return res.status(500).send('Database update failed.');
+    }
+
+    console.log(`Event ${eventId} updated successfully!`);
+    res.redirect('/events'); // refresh the events page
+  });
+});
 
 /*
     LISTENER
