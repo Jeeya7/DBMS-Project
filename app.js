@@ -28,6 +28,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 app.use(express.urlencoded({ extended: true }));
 
+// DEBUG: log every request and health endpoint
+app.use((req, res, next) => {
+  console.log(new Date().toISOString(), req.method, req.originalUrl);
+  next();
+});
+
+app.get('/ping', (req, res) => res.send('ok'));
+
 // expose common template values to all views
 app.use((req, res, next) => {
   res.locals.year = new Date().getFullYear();
@@ -173,24 +181,15 @@ app.get('/department-events', (req, res) => {
 app.post('/update-event', (req, res) => {
   const { eventId, eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
 
-  const sql = `
-    UPDATE Events
-    SET 
-      eventName = ?, 
-      eventDate = ?, 
-      startTime = ?, 
-      expectedAttendance = ?, 
-      Locations_locationId = ?
-    WHERE eventId = ?;
-  `;
+  const sql = 'CALL UpdateEvent(?, ?, ?, ?, ?, ?)';
 
-  const params = [eventName, eventDate, startTime, expectedAttendance, locationId, eventId];
+  const params = [parseInt(eventId, 10), eventName, eventDate, startTime, expectedAttendance, parseInt(locationId, 10)];
 
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
-  executor.query(sql, params, (err, result) => {
+  executor.query(sql, params, (err) => {
     if (err) {
-      console.error(' Error updating event:', err);
+      console.error('Error updating event:', err);
       return res.status(500).send('Database update failed.');
     }
 
