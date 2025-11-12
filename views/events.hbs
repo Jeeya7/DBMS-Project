@@ -38,6 +38,32 @@
   </tbody>
 </table>
 
+<h3>Add New Event</h3>
+<form action="/add-event" method="POST" class="add-form">
+
+  <label for="eventName">Event Name:</label>
+  <input type="text" id="eventName" name="eventName" placeholder="Enter event name" required>
+
+  <label for="eventDate">Date:</label>
+  <input type="date" id="eventDate" name="eventDate" required>
+
+  <label for="startTime">Start Time:</label>
+  <input type="time" id="startTime" name="startTime" required>
+
+  <label for="expectedAttendance">Expected Attendance:</label>
+  <input type="number" id="expectedAttendance" name="expectedAttendance" placeholder="e.g. 100" required>
+
+  <label for="locationId">Location:</label>
+  <select id="locationId" name="locationId" required>
+    <option value="">-- Select a Location --</option>
+    {{#each locations}}
+      <option value="{{this.locationId}}">{{this.locationName}}</option>
+    {{/each}}
+  </select>
+
+  <button type="submit">Add Event</button>
+</form>
+
 
 <h3>Update Event Details</h3>
 

@@ -89,25 +89,33 @@ app.get('/departments', (req, res) => {
     res.render('departments', { departments: results });
   });
 });
-
 app.get('/events', (req, res) => {
+  const getEvents = 'SELECT * FROM Events;';
+  const getLocations = 'SELECT * FROM Locations;';
 
-  const sql = 'SELECT * FROM Events;';
-
-  // support both exports: db.pool.query(...) or db.query(...)
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
   if (!executor || typeof executor.query !== 'function') {
     console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
-    return res.status(500).render('events', { events: [], error: 'Database not configured' });
+    return res.status(500).render('events', { events: [], locations: [], error: 'Database not configured' });
   }
 
-  executor.query(sql, (error, results) => {
-    if (error) {
-      console.error('DB error fetching events:', error);
-      return res.status(500).render('events', { events: [], error: error.message });
+  // Fetch both events and locations
+  executor.query(getEvents, (errEvents, eventResults) => {
+    if (errEvents) {
+      console.error(' Error fetching events:', errEvents);
+      return res.status(500).render('events', { events: [], locations: [], error: errEvents.message });
     }
-    res.render('events', { events: results });
+
+    executor.query(getLocations, (errLocations, locationResults) => {
+      if (errLocations) {
+        console.error(' Error fetching locations:', errLocations);
+        return res.status(500).render('events', { events: eventResults, locations: [], error: errLocations.message });
+      }
+
+      // Send both datasets to the view
+      res.render('events', { events: eventResults, locations: locationResults });
+    });
   });
 });
 
@@ -169,6 +177,7 @@ app.get('/department-events', (req, res) => {
     });
 });
 
+
 app.post('/update-event', (req, res) => {
   const { eventId, eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
 
@@ -188,6 +197,61 @@ app.post('/update-event', (req, res) => {
     res.redirect('/events'); // refresh the events page
   });
 });
+
+app.get('/events', (req, res) => {
+  const getEvents = 'SELECT * FROM Events;';
+  const getLocations = 'SELECT * FROM Locations;';
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  if (!executor || typeof executor.query !== 'function') {
+    console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+    return res.status(500).render('events', { events: [], locations: [], error: 'Database not configured' });
+  }
+
+  // Fetch both events and locations
+  executor.query(getEvents, (errEvents, eventResults) => {
+    if (errEvents) {
+      console.error(' Error fetching events:', errEvents);
+      return res.status(500).render('events', { events: [], locations: [], error: errEvents.message });
+    }
+
+    executor.query(getLocations, (errLocations, locationResults) => {
+      if (errLocations) {
+        console.error(' Error fetching locations:', errLocations);
+        return res.status(500).render('events', { events: eventResults, locations: [], error: errLocations.message });
+      }
+
+      // Send both datasets to the view
+      res.render('events', { events: eventResults, locations: locationResults });
+    });
+  });
+});
+
+
+app.post('/add-event', (req, res) => {
+  const { eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
+
+  const sql = `
+    INSERT INTO Events (eventName, eventDate, startTime, expectedAttendance, Locations_locationId)
+    VALUES (?, ?, ?, ?, ?);
+  `;
+
+  const params = [eventName, eventDate, startTime, expectedAttendance, locationId];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err, result) => {
+    if (err) {
+      console.error(' Error adding new event:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+
+    console.log(` Event "${eventName}" added successfully!`);
+    res.redirect('/events'); // reload the Events page
+  });
+});
+
 
 /*
     LISTENER
