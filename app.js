@@ -172,8 +172,10 @@ app.get('/event-attendance', (req, res) => {
   });
 });
 
-app.get('/department-events', (req, res) => {
+app.get('/departments-events', (req, res) => {
   const sql = 'SELECT * FROM Departments_has_Events;';
+  const Eventssql = 'SELECT * FROM Events;';  
+  const Departmentssql = 'SELECT * FROM Departments;';
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
   if (!executor || typeof executor.query !== 'function') {
@@ -184,9 +186,35 @@ app.get('/department-events', (req, res) => {
   executor.query(sql, (error, results) => {
     if (error) {
       console.error('DB error fetching department events:', error);
-      return res.status(500).render('departments-with-events', { events: [], error: error.message });
+      return res.status(500).render('departments-with-events', { eventsDepartments: [], error: error.message });
     }
-    res.render('departments-with-events', { events: results });
+    executor.query(Eventssql, (eventError, eventResults) => {
+      if (eventError) {
+        console.error('DB error fetching events:', eventError);
+        return res.status(500).render('departments-with-events', {
+          eventsDepartments: results,
+          eventsList: [],
+          departmentsList: [],
+          error: eventError.message
+        });
+      }
+      executor.query(Departmentssql, (deptError, deptResults) => {
+        if (deptError) {
+          console.error('DB error fetching departments:', deptError);
+          return res.status(500).render('departments-with-events', {
+            eventsDepartments: results,
+            eventsList: eventResults,
+            departmentsList: [],
+            error: deptError.message
+          });
+        }
+        res.render('departments-with-events', {
+          eventsDepartments: results,
+          eventsList: eventResults,
+          departmentsList: deptResults
+        });
+      });
+    });
   });
 });
 
@@ -282,8 +310,7 @@ app.post('/add-location', (req, res) => {
 
 app.post('/add-department', (req, res) => {
   const { departmentName } = req.body;
-  const sql = `CALL InsertDepartment(?)`; // your stored procedure
-  const params = [departmentName];
+  const sql = `CALL InsertDepartment(?)`; 
 
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
@@ -298,7 +325,21 @@ app.post('/add-department', (req, res) => {
   });
 });
 
-
+app.post('/add-departments-events', (req, res) => {
+  const { departmentId, eventId } = req.body;
+  const sql = `CALL InsertDepartmentsHasEvents(?, ?)`; 
+  const params = [parseInt(departmentId, 10), parseInt(eventId, 10)];
+  
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error adding new department-event association:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+    console.log(`Department-Event association (Department ID: ${departmentId}, Event ID: ${eventId}) added successfully!`);
+    res.redirect('/departments-events'); // reload the Departments-Events page
+  });
+});
 
 /*******************************
  * Update ROUTES
@@ -467,7 +508,7 @@ app.post('/delete-department-event', (req, res) => {
       return res.status(500).send('Database delete failed.');
     }
     console.log(`Department-Event association (Department ID: ${departmentId}, Event ID: ${eventId}) deleted successfully!`);
-    res.redirect('/department-events');;
+    res.redirect('/departments-events');;
   });
 }); 
 

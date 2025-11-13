@@ -11,8 +11,8 @@
     </tr>
   </thead>
   <tbody>
-    {{#if events.length}}
-      {{#each events}}
+    {{#if eventsDepartments.length}}
+      {{#each eventsDepartments}}
         <tr>
           <td>{{this.Departments_departmentId}}</td>
           <td>{{this.Events_eventId}}</td>
@@ -30,3 +30,27 @@
     {{/if}}
   </tbody>
 </table>
+
+<h3>Add New Department Event</h3>
+<form action="/add-departments-events" method="POST" class="add-form">
+
+  <select id="departmentId" name="departmentId" required>
+    <option value="">-- Select Department ID --</option>
+    {{#each departmentsList}}
+    <option value="{{this.departmentId}}">
+      {{this.departmentId}} — {{this.departmentName}}
+    </option>
+    {{/each}}
+  </select>
+
+  <select id="eventId" name="eventId" required>
+    <option value="">-- Select Event ID --</option>
+    {{#each eventsList}}
+    <option value="{{this.eventId}}">
+      {{this.eventId}} — {{this.eventName}}
+    </option>
+    {{/each}}
+  </select>
+
+  <button type="submit">Add Department</button>
+</form>
