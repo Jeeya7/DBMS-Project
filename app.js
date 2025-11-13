@@ -52,6 +52,11 @@ app.get('/', (req, res) => {
 });
 
 // UI PAGES FOR EACH TABLE
+
+/*******************************
+ * READ ROUTES
+ * *****************************/
+
 app.get('/students', (req, res) => {
   const sql = 'SELECT * FROM Students;';
   const departmentsSql = 'SELECT * FROM Departments;';
@@ -186,28 +191,6 @@ app.get('/department-events', (req, res) => {
 });
 
 
-app.post('/update-event', (req, res) => {
-  const { eventId, eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
-
-  const sql = `CALL UpdateEvent(?, ?, ?, ?, ?, ?)`;
-
-  const params = [parseInt(eventId, 10), eventName, eventDate, startTime, expectedAttendance, parseInt(locationId, 10)];
-
-  console.log('Update Event Params:', params); // Debugging line to log parameters
-
-  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
-
-  executor.query(sql, params, (err) => {
-    if (err) {
-      console.error('Error updating event:', err);
-      return res.status(500).send('Database update failed.');
-    }
-
-    console.log(`Event ${eventId} updated successfully!`);
-    res.redirect('/events'); // refresh the events page
-  });
-});
-
 app.get('/events', (req, res) => {
   const getEvents = 'SELECT * FROM Events;';
   const getLocations = 'SELECT * FROM Locations;';
@@ -238,7 +221,10 @@ app.get('/events', (req, res) => {
   });
 });
 
-
+/*******************************
+ * Insert ROUTES
+ * *****************************/
+ 
 app.post('/add-event', (req, res) => {
   const { eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
 
@@ -276,6 +262,71 @@ app.post('/add-student', (req, res) => {
   });
 });
 
+app.post('/add-location', (req, res) => {
+  const { locationName, address, capacity } = req.body;
+  const sql = `CALL InsertLocation(?, ?, ?)`;
+  const params = [locationName, address, parseInt(capacity, 10)];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error adding new location:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+
+    console.log(`Location "${locationName}" added successfully!`);
+    res.redirect('/locations'); // reload the Locations page
+  });
+});
+
+
+app.post('/add-department', (req, res) => {
+  const { departmentName } = req.body;
+  const sql = `CALL InsertDepartment(?)`; // your stored procedure
+  const params = [departmentName];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error adding new department:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+
+    console.log(`Department "${departmentName}" added successfully!`);
+    res.redirect('/departments'); // reload the Departments page
+  });
+});
+
+
+
+/*******************************
+ * Update ROUTES
+ * *****************************/
+
+app.post('/update-event', (req, res) => {
+  const { eventId, eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
+
+  const sql = `CALL UpdateEvent(?, ?, ?, ?, ?, ?)`;
+
+  const params = [parseInt(eventId, 10), eventName, eventDate, startTime, expectedAttendance, parseInt(locationId, 10)];
+
+  console.log('Update Event Params:', params); // Debugging line to log parameters
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error updating event:', err);
+      return res.status(500).send('Database update failed.');
+    }
+
+    console.log(`Event ${eventId} updated successfully!`);
+    res.redirect('/events'); // refresh the events page
+  });
+});
+
+
 app.post('/update-student', (req, res) => {
   const { studentId, firstName, lastName, email, departmentId } = req.body;
 
@@ -295,22 +346,6 @@ app.post('/update-student', (req, res) => {
   });
 });
 
-app.post('/add-location', (req, res) => {
-  const { locationName, address, capacity } = req.body;
-  const sql = `CALL InsertLocation(?, ?, ?)`;
-  const params = [locationName, address, parseInt(capacity, 10)];
-
-  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
-  executor.query(sql, params, (err) => {
-    if (err) {
-      console.error('Error adding new location:', err);
-      return res.status(500).send('Database insert failed.');
-    }
-
-    console.log(`Location "${locationName}" added successfully!`);
-    res.redirect('/locations'); // reload the Locations page
-  });
-});
 
 app.post('/update-location', (req, res) => {
   const { locationId, locationName, address, capacity } = req.body;
@@ -333,23 +368,6 @@ app.post('/update-location', (req, res) => {
   });
 });
 
-app.post('/add-department', (req, res) => {
-  const { departmentName } = req.body;
-  const sql = `CALL InsertDepartment(?)`; // your stored procedure
-  const params = [departmentName];
-
-  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
-
-  executor.query(sql, params, (err) => {
-    if (err) {
-      console.error('Error adding new department:', err);
-      return res.status(500).send('Database insert failed.');
-    }
-
-    console.log(`Department "${departmentName}" added successfully!`);
-    res.redirect('/departments'); // reload the Departments page
-  });
-});
 
 app.post('/update-department', (req, res) => {
   const { departmentId, departmentName } = req.body;
