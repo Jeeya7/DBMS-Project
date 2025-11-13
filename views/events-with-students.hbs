@@ -5,28 +5,57 @@
 <table class="table">
   <thead>
     <tr>
-      <th>Event</th>
-      <th>Student</th>
+      <th>Event ID</th>
+      <th>Event Name</th>
+      <th>Student ID</th>
+      <th>Student Name</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
-    {{#if events.length}}
-      {{#each events}}
+    {{#if eventStudentLinks.length}}
+      {{#each eventStudentLinks}}
         <tr>
-          <td>{{this.Events_eventId}}</td>
-          <td>{{this.Students_studentId}}</td>
+          <td>{{this.eventId}}</td>
+          <td>{{this.eventName}}</td>
+          <td>{{this.studentId}}</td>
+          <td>{{this.studentName}}</td>
           <td>
             <form action="/delete-event-student" method="POST" style="display:inline;">
-              <input type="hidden" name="eventId" value="{{this.Events_eventId}}">
-              <input type="hidden" name="studentId" value="{{this.Students_studentId}}">
+              <input type="hidden" name="eventId" value="{{this.eventId}}">
+              <input type="hidden" name="studentId" value="{{this.studentId}}">
               <button type="submit">Delete</button>
             </form>
           </td>
         </tr>
       {{/each}}
     {{else}}
-    <tr><td colspan="2">No data yet.</td></tr>
+      <tr><td colspan="5">No data yet.</td></tr>
     {{/if}}
   </tbody>
 </table>
+
+
+<h3>Add New Event Attendance</h3>
+<form action="/add-event-student" method="POST" class="add-form">
+
+  <select id="eventId" name="eventId" required>
+    <option value="">-- Select Event --</option>
+    {{#each eventsList}}
+      <option value="{{this.eventId}}">
+        {{this.eventId}} — {{this.eventName}}
+      </option>
+    {{/each}}
+  </select>
+
+  <select id="studentId" name="studentId" required>
+    <option value="">-- Select Student --</option>
+    {{#each studentsList}}
+      <option value="{{this.studentId}}">
+        {{this.studentId}} — {{this.firstName}} {{this.lastName}}
+      </option>
+    {{/each}}
+  </select>
+
+  <button type="submit">Add Attendance</button>
+</form>

@@ -152,25 +152,43 @@ app.get('/locations', (req, res) => {
   });
 });
 
-
-
 app.get('/event-attendance', (req, res) => {
-  const sql = 'SELECT * FROM Events_has_Students;';
-  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  const linksSql = `
+    SELECT 
+      e.eventId,
+      e.eventName,
+      s.studentId,
+      CONCAT(s.firstName, ' ', s.lastName) AS studentName
+    FROM Events_has_Students es
+    JOIN Events e ON e.eventId = es.Events_eventId
+    JOIN Students s ON s.studentId = es.Students_studentId;
+  `;
 
-  if (!executor || typeof executor.query !== 'function') {
-    console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
-    return res.status(500).render('events-with-students', { events: [], error: 'Database not configured' });
-  }
+  const getEvents = 'SELECT eventId, eventName FROM Events;';
+  const getStudents = 'SELECT studentId, firstName, lastName FROM Students;';
 
-  executor.query(sql, (error, results) => {
-    if (error) {
-      console.error('DB error fetching event attendance:', error);
-      return res.status(500).render('events-with-students', { events: [], error: error.message });
-    }
-    res.render('events-with-students', { events: results });
+  const executor = db.pool || db;
+
+  executor.query(linksSql, (errLinks, linkResults) => {
+    if (errLinks) return res.status(500).send(errLinks.message);
+
+    executor.query(getEvents, (errEvents, eventResults) => {
+      if (errEvents) return res.status(500).send(errEvents.message);
+
+      executor.query(getStudents, (errStudents, studentResults) => {
+        if (errStudents) return res.status(500).send(errStudents.message);
+
+        res.render('events-with-students', {
+          eventStudentLinks: linkResults, // For the main table
+          eventsList: eventResults,       // For the event dropdown
+          studentsList: studentResults    // For the student dropdown
+        });
+      });
+    });
   });
 });
+
+
 
 app.get('/departments-events', (req, res) => {
   const sql = 'SELECT * FROM Departments_has_Events;';
@@ -529,6 +547,26 @@ app.post('/delete-event', (req, res) => {
 });
 
 
+/********
+ * M:M Events-Students Relationship
+ * 
+ */
+app.post('/add-event-student', (req, res) => {
+  const { eventId, studentId } = req.body;
+  const sql = 'CALL InsertEventsHasStudents(?, ?)';
+  const params = [parseInt(eventId, 10), parseInt(studentId, 10)];
+
+  const executor = db.pool || db;
+
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error adding new event-student association:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+    console.log(`Event-Student association (Event ID: ${eventId}, Student ID: ${studentId}) added successfully!`);
+    res.redirect('/event-attendance');
+  });
+});
 
 /*
     LISTENER
