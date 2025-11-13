@@ -343,7 +343,7 @@ app.post('/add-departments-events', (req, res) => {
 
 /*******************************
  * Update ROUTES
- * *****************************/
+ *******************************/
 
 app.post('/update-event', (req, res) => {
   const { eventId, eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
