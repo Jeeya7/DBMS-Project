@@ -16,24 +16,26 @@
   </thead>
   <tbody>
     {{#if events.length}}
-      {{#each events}}
-        <tr>
-          <td>{{this.eventId}}</td>
-          <td>{{this.eventName}}</td>
-          <td>{{this.eventDate}}</td>
-          <td>{{this.startTime}}</td>
-          <td>{{this.expectedAttendance}}</td>
-          <td>{{this.Locations_locationId}}</td>
-          <td>
-            <form action="/delete-event" method="POST" style="display:inline;">
-              <input type="hidden" name="eventId" value="{{this.eventId}}">
-              <button type="submit">Delete</button>
-            </form>
-          </td>
-        </tr>
-      {{/each}}
+    {{#each events}}
+    <tr>
+      <td>{{this.eventId}}</td>
+      <td>{{this.eventName}}</td>
+      <td>{{this.eventDate}}</td>
+      <td>{{this.startTime}}</td>
+      <td>{{this.expectedAttendance}}</td>
+      <td>{{this.Locations_locationId}}</td>
+      <td>
+        <form action="/delete-event" method="POST" style="display:inline;">
+          <input type="hidden" name="eventId" value="{{this.eventId}}">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
     {{else}}
-      <tr><td colspan="7">No event data yet.</td></tr>
+    <tr>
+      <td colspan="7">No event data yet.</td>
+    </tr>
     {{/if}}
   </tbody>
 </table>
@@ -57,7 +59,7 @@
   <select id="locationId" name="locationId" required>
     <option value="">-- Select a Location --</option>
     {{#each locations}}
-      <option value="{{this.locationId}}">{{this.locationName}}</option>
+    <option value="{{this.locationId}}">{{this.locationName}}</option>
     {{/each}}
   </select>
 
@@ -68,24 +70,20 @@
 <h3>Update Event Details</h3>
 
 <form action="/update-event" method="POST" class="update-form">
-  <!-- 1️⃣ Select Event by ID -->
+  <!-- Select Event by ID -->
   <label for="eventId">Select Event ID:</label>
   <select id="eventId" name="eventId" required>
     <option value="">-- Select an Event ID --</option>
     {{#each events}}
-      <option 
-        value="{{this.eventId}}" 
-        data-name="{{this.eventName}}" 
-        data-date="{{this.eventDate}}" 
-        data-start="{{this.startTime}}" 
-        data-attendance="{{this.expectedAttendance}}" 
-        data-location="{{this.Locations_locationId}}">
-        {{this.eventId}} — {{this.eventName}}
-      </option>
+    <option value="{{this.eventId}}" data-name="{{this.eventName}}" data-date="{{this.eventDate}}"
+      data-start="{{this.startTime}}" data-attendance="{{this.expectedAttendance}}"
+      data-location="{{this.Locations_locationId}}">
+      {{this.eventId}} — {{this.eventName}}
+    </option>
     {{/each}}
   </select>
 
-  <!-- 2️⃣ Autofilled fields -->
+  <!--  Autofilled fields -->
   <label for="eventName">Event Name:</label>
   <input type="text" id="eventName" name="eventName" placeholder="Enter new name" required>
 
@@ -99,8 +97,13 @@
   <input type="number" id="expectedAttendance" name="expectedAttendance" placeholder="e.g. 150" required>
 
   <label for="locationId">Location ID:</label>
-  <input type="number" id="locationId" name="locationId" placeholder="e.g. 2" required>
-
+  <select type="number" id="locationId" name="locationId" placeholder="e.g. 2" required>
+    <option value="">-- Select a LocationID --</option>
+    {{#each locations}}
+    <option value="{{this.locationId}}">{{this.locationId}} — {{this.locationName}}
+    </option>
+    {{/each}}
+  </select>
   <button type="submit">Update Event</button>
 </form>
 
