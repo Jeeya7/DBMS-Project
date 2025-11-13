@@ -22,7 +22,12 @@
           <td>{{this.lastName}}</td>
           <td>{{this.email}}</td>
           <td>{{this.Departments_departmentId}}</td>
-          <td><button>Delete</button></td>
+          <td>
+            <form action="/delete-student" method="POST" style="display:inline;">
+              <input type="hidden" name="studentId" value="{{this.studentId}}">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
         </tr>
       {{/each}}
     {{else}}

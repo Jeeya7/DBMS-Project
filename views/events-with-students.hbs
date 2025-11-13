@@ -16,7 +16,13 @@
         <tr>
           <td>{{this.Events_eventId}}</td>
           <td>{{this.Students_studentId}}</td>
-          <td><button>Delete</button></td>
+          <td>
+            <form action="/delete-event-student" method="POST" style="display:inline;">
+              <input type="hidden" name="eventId" value="{{this.Events_eventId}}">
+              <input type="hidden" name="studentId" value="{{this.Students_studentId}}">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
         </tr>
       {{/each}}
     {{else}}

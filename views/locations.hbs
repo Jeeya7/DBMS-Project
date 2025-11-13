@@ -21,7 +21,12 @@
       <td>{{this.locationName}}</td>
       <td>{{this.address}}</td>
       <td>{{this.capacity}}</td>
-      <td><button>Delete</button></td>
+      <td>
+        <form action="/delete-location" method="POST" style="display:inline;">
+          <input type="hidden" name="locationId" value="{{this.locationId}}">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
     </tr>
     {{/each}}
     {{else}}
