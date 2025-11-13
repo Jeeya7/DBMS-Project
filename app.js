@@ -370,6 +370,106 @@ app.post('/update-department', (req, res) => {
 });
 
 
+/********************************
+ * DELETE ROUTES
+ ********************************/
+
+app.post('/delete-department', (req, res) => {
+  const { departmentId } = req.body;
+  const sql = 'CALL DeleteDepartment(?)';
+  const params = [parseInt(departmentId, 10)];
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error deleting department:', err);
+      return res.status(500).send('Database delete failed.');
+    }
+    console.log(`Department ${departmentId} deleted successfully!`);
+    res.redirect('/departments');
+  });
+});
+
+app.post('/delete-student', (req, res) => {
+  const { studentId } = req.body;
+
+  const sql = 'CALL DeleteStudent(?)';
+  const params = [parseInt(studentId, 10)];
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error deleting student:', err);
+      return res.status(500).send('Database delete failed.');
+    }
+    console.log(`Student ${studentId} deleted successfully!`);
+    res.redirect('/students');
+  });
+});
+
+app.post('/delete-location', (req, res) => {
+  const { locationId } = req.body;
+  const sql = 'CALL DeleteLocation(?)';
+  const params = [parseInt(locationId, 10)];
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ?
+    db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error deleting location:', err);
+      return res.status(500).send('Database delete failed.');
+    }
+    console.log(`Location ${locationId} deleted successfully!`);
+    res.redirect('/locations');
+  });
+});
+
+app.post('/delete-event-student', (req, res) => {
+  const { eventId, studentId } = req.body;
+  const sql = 'CALL DeleteEventHasStudent(?, ?)';
+  const params = [parseInt(eventId, 10), parseInt(studentId, 10)];
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ?
+    db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error deleting event-student association:', err);
+      return res.status(500).send('Database delete failed.');
+    }
+    console.log(`Event-Student association (Event ID: ${eventId}, Student ID: ${studentId}) deleted successfully!`);
+    res.redirect('/event-attendance');;
+  });
+});
+
+app.post('/delete-department-event', (req, res) => {
+  const { departmentId, eventId } = req.body;
+  const sql = 'CALL DeleteDepartmentHasEvent(?, ?)';
+  const params = [parseInt(departmentId, 10), parseInt(eventId, 10)];
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ?
+    db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error deleting department-event association:', err);
+      return res.status(500).send('Database delete failed.');
+    }
+    console.log(`Department-Event association (Department ID: ${departmentId}, Event ID: ${eventId}) deleted successfully!`);
+    res.redirect('/department-events');;
+  });
+}); 
+
+app.post('/delete-event', (req, res) => {
+  const { eventId } = req.body;
+  const sql = 'CALL DeleteEvent(?)';
+  const params = [parseInt(eventId, 10)];
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ?
+    db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error deleting event:', err);
+      return res.status(500).send('Database delete failed.');
+    }
+    console.log(`Event ${eventId} deleted successfully!`);
+    res.redirect('/events');
+  });
+});
+
+
 
 /*
     LISTENER
