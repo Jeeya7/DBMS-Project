@@ -33,4 +33,42 @@
   </tbody>
 </table>
 
-<button>Add Department</button>
+
+<h3>Add New Department</h3>
+<form action="/add-department" method="POST" class="add-form">
+
+  <label for="departmentName">Department Name:</label>
+  <input type="text" id="departmentName" name="departmentName" placeholder="Enter department name" required>
+
+  <button type="submit">Add Department</button>
+</form>
+
+<h3>Update Department Details</h3>
+
+<form action="/update-department" method="POST" class="update-form">
+  <!-- Select Department by ID -->
+  <label for="departmentId">Select Department ID:</label>
+  <select id="departmentId" name="departmentId" required>
+    <option value="">-- Select an Department ID --</option>
+    {{#each departments}}
+    <option value="{{this.departmentId}}" data-name="{{this.departmentName}}">
+      {{this.departmentId}} — {{this.departmentName}}
+    </option>
+    {{/each}}
+  </select>
+
+  <label for="departmentName"> Update Department Name</label>
+  <input type="text" id="departmentName" name="departmentName" placeholder="Enter updated department name" required>
+
+  <button type="submit">Update Department</button>
+</form>
+
+
+<script>
+  // Only applies to update form
+  document.getElementById('updateDepartmentId').addEventListener('change', function () {
+    const selected = this.options[this.selectedIndex];
+    const name = selected.getAttribute('data-name');
+    document.getElementById('updateDepartmentName').value = name || '';
+  });
+</script>

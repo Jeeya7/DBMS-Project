@@ -95,6 +95,8 @@ app.get('/departments', (req, res) => {
     res.render('departments', { departments: results });
   });
 });
+
+
 app.get('/events', (req, res) => {
   const getEvents = 'SELECT * FROM Events;';
   const getLocations = 'SELECT * FROM Locations;';
@@ -146,41 +148,41 @@ app.get('/locations', (req, res) => {
 });
 
 
-app.get('/event-attendance', (req, res) =>
-{
-    const sql = 'SELECT * FROM Events_has_Students;';
-    const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
-    if (!executor || typeof executor.query !== 'function') {
-        console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
-        return res.status(500).render('events-with-students', { events: [], error: 'Database not configured' });
+app.get('/event-attendance', (req, res) => {
+  const sql = 'SELECT * FROM Events_has_Students;';
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  if (!executor || typeof executor.query !== 'function') {
+    console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+    return res.status(500).render('events-with-students', { events: [], error: 'Database not configured' });
+  }
+
+  executor.query(sql, (error, results) => {
+    if (error) {
+      console.error('DB error fetching event attendance:', error);
+      return res.status(500).render('events-with-students', { events: [], error: error.message });
     }
-
-    executor.query(sql, (error, results) => {
-        if (error) {
-            console.error('DB error fetching event attendance:', error);
-            return res.status(500).render('events-with-students', { events: [], error: error.message });
-        }
-        res.render('events-with-students', { events: results });
-    });
+    res.render('events-with-students', { events: results });
+  });
 });
 
 app.get('/department-events', (req, res) => {
-    const sql = 'SELECT * FROM Departments_has_Events;';
-    const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  const sql = 'SELECT * FROM Departments_has_Events;';
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
-    if (!executor || typeof executor.query !== 'function') {
-        console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
-        return res.status(500).render('departments-with-events', { events: [], error: 'Database not configured' });
+  if (!executor || typeof executor.query !== 'function') {
+    console.error('DB executor not found on db-connector export:', Object.keys(db || {}));
+    return res.status(500).render('departments-with-events', { events: [], error: 'Database not configured' });
+  }
+
+  executor.query(sql, (error, results) => {
+    if (error) {
+      console.error('DB error fetching department events:', error);
+      return res.status(500).render('departments-with-events', { events: [], error: error.message });
     }
-
-    executor.query(sql, (error, results) => {
-        if (error) {
-            console.error('DB error fetching department events:', error);
-            return res.status(500).render('departments-with-events', { events: [], error: error.message });
-        }
-        res.render('departments-with-events', { events: results });
-    });
+    res.render('departments-with-events', { events: results });
+  });
 });
 
 
@@ -276,10 +278,10 @@ app.post('/add-student', (req, res) => {
 
 app.post('/update-student', (req, res) => {
   const { studentId, firstName, lastName, email, departmentId } = req.body;
-  
+
   const sql = 'CALL UpdateStudent(?, ?, ?, ?, ?)';
   const params = [parseInt(studentId, 10), firstName, lastName, email, parseInt(departmentId, 10)];
-  
+
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
   executor.query(sql, params, (err) => {
@@ -317,7 +319,7 @@ app.post('/update-location', (req, res) => {
   const params = [parseInt(locationId, 10), locationName, address, parseInt(capacity, 10)];
 
   console.log('Update Location Params:', params); // Debugging line to log parameters
-  
+
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
   executor.query(sql, params, (err) => {
@@ -330,6 +332,43 @@ app.post('/update-location', (req, res) => {
     res.redirect('/locations'); // refresh the locations page
   });
 });
+
+app.post('/add-department', (req, res) => {
+  const { departmentName } = req.body;
+  const sql = `CALL InsertDepartment(?)`; // your stored procedure
+  const params = [departmentName];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error adding new department:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+
+    console.log(`Department "${departmentName}" added successfully!`);
+    res.redirect('/departments'); // reload the Departments page
+  });
+});
+
+app.post('/update-department', (req, res) => {
+  const { departmentId, departmentName } = req.body;
+  const sql = `CALL UpdateDepartment(?, ?)`; // your stored procedure
+  const params = [parseInt(departmentId, 10), departmentName];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error updating department:', err);
+      return res.status(500).send('Database update failed.');
+    }
+
+    console.log(`Department ${departmentId} updated successfully!`);
+    res.redirect('/departments'); // refresh the Departments page
+  });
+});
+
 
 
 /*
