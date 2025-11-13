@@ -31,4 +31,52 @@
   </tbody>
 </table>
 
-<button>Add Student</button>
+<h3>Add New Student</h3>
+<form action="/add-student" method="POST" class="add-form">
+
+  <label for="add-firstName">First Name:</label>
+  <input type="text" id="add-firstName" name="firstName" placeholder="Enter first name" required>
+
+  <label for="add-lastName">Last Name:</label>
+  <input type="text" id="add-lastName" name="lastName" placeholder="Enter last name" required>
+  <label for="add-email">Email:</label>
+  <input type="email" id="add-email" name="email" placeholder="Enter email" required>
+
+  <label for="add-departmentId">Department:</label>
+  <select id="add-departmentId" name="departmentId" required>
+    <option value="">-- Select a Department --</option>
+    {{#each departments}}
+      <option value="{{this.departmentId}}">{{this.departmentName}}</option>
+    {{/each}}
+  </select>
+
+  <button type="submit">Add Student</button>
+</form>
+
+
+<h3>Update Existing Student Details</h3>
+
+<form action="/update-student" method="POST" class="update-form">
+  <label for="update-studentId">Select Student:</label>
+  <select id="update-studentId" name="studentId" required>
+    <option value="">-- Select a Student --</option>
+    {{#each students}}
+      <option value="{{this.studentId}}">{{this.firstName}} {{this.lastName}}</option>
+    {{/each}}
+  </select>
+  <label for="update-firstName">First Name:</label>
+  <input type="text" id="update-firstName" name="firstName" placeholder="Enter new first name" required>
+  <label for="update-lastName">Last Name:</label>
+  <input type="text" id="update-lastName" name="lastName" placeholder="Enter new last name" required>
+  <label for="update-email">Email:</label>
+  <input type="email" id="update-email" name="email" placeholder="Enter new email" required>
+  <label for="update-departmentId">Department:</label>
+  <select id="update-departmentId" name="departmentId" required>
+    <option value="">-- Select a Department --</option>
+    {{#each departments}}
+      <option value="{{this.departmentId}}">{{this.departmentName}}</option>
+    {{/each}}
+  </select>
+
+  <button type="submit">Update Student</button>
+</form>

@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
 // UI PAGES FOR EACH TABLE
 app.get('/students', (req, res) => {
   const sql = 'SELECT * FROM Students;';
-
+  const departmentsSql = 'SELECT * FROM Departments;';
   // support both exports: db.pool.query(...) or db.query(...)
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
@@ -68,7 +68,13 @@ app.get('/students', (req, res) => {
       console.error('DB error fetching students:', error); // <-- full error in server console
       return res.status(500).render('students', { students: [], error: error.message });
     }
-    res.render('students', { students: results });
+    executor.query(departmentsSql, (deptError, deptResults) => {
+      if (deptError) {
+        console.error('DB error fetching departments:', deptError);
+        return res.status(500).render('students', { students: results, departments: [], error: deptError.message });
+      }
+      res.render('students', { students: results, departments: deptResults });
+    });
   });
 });
 
@@ -252,6 +258,41 @@ app.post('/add-event', (req, res) => {
   });
 });
 
+app.post('/add-student', (req, res) => {
+  const { firstName, lastName, email, departmentId } = req.body;
+  const sql = `CALL InsertStudent(?, ?, ?, ?)`;
+  const params = [firstName, lastName, email, parseInt(departmentId, 10)];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error adding new student:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+
+    console.log(`Student "${firstName} ${lastName}" added successfully!`);
+    res.redirect('/students'); // reload the Students page
+  });
+});
+
+app.post('/update-student', (req, res) => {
+  const { studentId, firstName, lastName, email, departmentId } = req.body;
+  
+  const sql = 'CALL UpdateStudent(?, ?, ?, ?, ?)';
+  const params = [parseInt(studentId, 10), firstName, lastName, email, parseInt(departmentId, 10)];
+  
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error updating student:', err);
+      return res.status(500).send('Database update failed.');
+    }
+
+    console.log(`Student ${studentId} updated successfully!`);
+    res.redirect('/students'); // refresh the students page
+  });
+});
 
 /*
     LISTENER
