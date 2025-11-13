@@ -35,7 +35,7 @@
 
 
 <h3>Add New Location </h3>
-<form action="/add-lcoations" method="POST" class="add-form">
+<form action="/add-location" method="POST" class="add-form">
 
   <label for="locationName">Location Name:</label>
   <input type="text" id="locationName" name="locationName" placeholder="Enter Location name" required>
@@ -52,8 +52,16 @@
 
 <h3>Update Location Details</h3>
 <form action="/update-location" method="POST" class="add-form">
-  <label for="locationName"> Location Name: </label>
-  <input type="text" id="locationName" name="locationName" placeholder="Enter Location name" required>
+
+  <label for="locationId">Select Location ID:</label>
+  <select id="locationId" name="locationId" required>
+    <option value="">-- Select a Location ID --</option>
+    {{#each locations}}
+    <option value="{{this.locationId}}" data-name="{{this.locationName}}" data-address="{{this.address}}" data-capacity="{{this.capacity}}">
+      {{this.locationId}} — {{this.locationName}}
+    </option>
+    {{/each}}
+  </select>
 
   <label for="address">Address</label>
   <input type="text" id="address" name="address" required>
@@ -63,5 +71,5 @@
   <button type="submit">Update Location</button>
 </form>
 
-
+<script src="/js/locations.js"></script>
 

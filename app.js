@@ -187,9 +187,11 @@ app.get('/department-events', (req, res) => {
 app.post('/update-event', (req, res) => {
   const { eventId, eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
 
-  const sql = 'CALL UpdateEvent(?, ?, ?, ?, ?, ?)';
+  const sql = `CALL UpdateEvent(?, ?, ?, ?, ?, ?)`;
 
   const params = [parseInt(eventId, 10), eventName, eventDate, startTime, expectedAttendance, parseInt(locationId, 10)];
+
+  console.log('Update Event Params:', params); // Debugging line to log parameters
 
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
@@ -238,10 +240,7 @@ app.get('/events', (req, res) => {
 app.post('/add-event', (req, res) => {
   const { eventName, eventDate, startTime, expectedAttendance, locationId } = req.body;
 
-  const sql = `
-    INSERT INTO Events (eventName, eventDate, startTime, expectedAttendance, Locations_locationId)
-    VALUES (?, ?, ?, ?, ?);
-  `;
+  const sql = `CALL InsertEvent(?, ?, ?, ?, ?)`;
 
   const params = [eventName, eventDate, startTime, expectedAttendance, locationId];
 
@@ -293,6 +292,45 @@ app.post('/update-student', (req, res) => {
     res.redirect('/students'); // refresh the students page
   });
 });
+
+app.post('/add-location', (req, res) => {
+  const { locationName, address, capacity } = req.body;
+  const sql = `CALL InsertLocation(?, ?, ?)`;
+  const params = [locationName, address, parseInt(capacity, 10)];
+
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error adding new location:', err);
+      return res.status(500).send('Database insert failed.');
+    }
+
+    console.log(`Location "${locationName}" added successfully!`);
+    res.redirect('/locations'); // reload the Locations page
+  });
+});
+
+app.post('/update-location', (req, res) => {
+  const { locationId, locationName, address, capacity } = req.body;
+
+  const sql = `CALL UpdateLocation(?, ?, ?, ?)`;
+  const params = [parseInt(locationId, 10), locationName, address, parseInt(capacity, 10)];
+
+  console.log('Update Location Params:', params); // Debugging line to log parameters
+  
+  const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
+
+  executor.query(sql, params, (err) => {
+    if (err) {
+      console.error('Error updating location:', err);
+      return res.status(500).send('Database update failed.');
+    }
+
+    console.log(`Location ${locationId} updated successfully!`);
+    res.redirect('/locations'); // refresh the locations page
+  });
+});
+
 
 /*
     LISTENER
