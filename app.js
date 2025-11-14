@@ -153,16 +153,7 @@ app.get('/locations', (req, res) => {
 });
 
 app.get('/event-attendance', (req, res) => {
-  const linksSql = `
-    SELECT 
-      e.eventId,
-      e.eventName,
-      s.studentId,
-      CONCAT(s.firstName, ' ', s.lastName) AS studentName
-    FROM Events_has_Students es
-    JOIN Events e ON e.eventId = es.Events_eventId
-    JOIN Students s ON s.studentId = es.Students_studentId;
-  `;
+  const linksSql = `CALL GetEventsAttendance();`;
 
   const getEvents = 'SELECT eventId, eventName FROM Events;';
   const getStudents = 'SELECT studentId, firstName, lastName FROM Students;';
@@ -179,7 +170,7 @@ app.get('/event-attendance', (req, res) => {
         if (errStudents) return res.status(500).send(errStudents.message);
 
         res.render('events-with-students', {
-          eventStudentLinks: linkResults, // For the main table
+          eventStudentLinks: linkResults[0], // For the main table
           eventsList: eventResults,       // For the event dropdown
           studentsList: studentResults    // For the student dropdown
         });
@@ -188,10 +179,8 @@ app.get('/event-attendance', (req, res) => {
   });
 });
 
-
-
 app.get('/departments-events', (req, res) => {
-  const sql = 'SELECT * FROM Departments_has_Events;';
+  const sql = `CALL GetDepartmentsEvents(); `;
   const Eventssql = 'SELECT * FROM Events;';  
   const Departmentssql = 'SELECT * FROM Departments;';
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
@@ -206,11 +195,12 @@ app.get('/departments-events', (req, res) => {
       console.error('DB error fetching department events:', error);
       return res.status(500).render('departments-with-events', { eventsDepartments: [], error: error.message });
     }
+    console.log('Departments-Events Results:', results); // Debugging line to log results
     executor.query(Eventssql, (eventError, eventResults) => {
       if (eventError) {
         console.error('DB error fetching events:', eventError);
         return res.status(500).render('departments-with-events', {
-          eventsDepartments: results,
+          eventsDepartments: results[0],
           eventsList: [],
           departmentsList: [],
           error: eventError.message
@@ -220,14 +210,14 @@ app.get('/departments-events', (req, res) => {
         if (deptError) {
           console.error('DB error fetching departments:', deptError);
           return res.status(500).render('departments-with-events', {
-            eventsDepartments: results,
+            eventsDepartments: results[0],
             eventsList: eventResults,
             departmentsList: [],
             error: deptError.message
           });
         }
         res.render('departments-with-events', {
-          eventsDepartments: results,
+          eventsDepartments: results[0],
           eventsList: eventResults,
           departmentsList: deptResults
         });

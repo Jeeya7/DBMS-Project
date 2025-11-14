@@ -5,8 +5,10 @@
 <table class="table">
   <thead>
     <tr>
-      <th>Department</th>
+      <th>Event Id</th>
       <th>Event Name</th>
+      <th>Department Id</th>
+      <th>Department Name</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -14,8 +16,10 @@
     {{#if eventsDepartments.length}}
       {{#each eventsDepartments}}
         <tr>
-          <td>{{this.Departments_departmentId}}</td>
-          <td>{{this.Events_eventId}}</td>
+          <td>{{this.eventId}}</td>
+          <td>{{this.eventName}}</td>
+          <td>{{this.departmentId}}</td>
+          <td>{{this.departmentName}}</td>
           <td>
             <form action="/delete-department-event" method="POST" style="display:inline;">
               <input type="hidden" name="departmentId" value="{{this.Departments_departmentId}}">
