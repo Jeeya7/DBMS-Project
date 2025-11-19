@@ -318,7 +318,8 @@ app.post('/add-location', (req, res) => {
 
 app.post('/add-department', (req, res) => {
   const { departmentName } = req.body;
-  const sql = `CALL InsertDepartment(?)`; 
+  const sql = `CALL InsertDepartment(?)`;
+  const params = [departmentName];   // <-- YOU NEED THIS
 
   const executor = (db && db.pool && typeof db.pool.query === 'function') ? db.pool : db;
 
@@ -329,9 +330,10 @@ app.post('/add-department', (req, res) => {
     }
 
     console.log(`Department "${departmentName}" added successfully!`);
-    res.redirect('/departments'); // reload the Departments page
+    res.redirect('/departments');
   });
 });
+
 
 app.post('/add-departments-events', (req, res) => {
   const { departmentId, eventId } = req.body;
@@ -557,6 +559,30 @@ app.post('/add-event-student', (req, res) => {
     res.redirect('/event-attendance');
   });
 });
+
+
+/**
+ * RESET DATABASE ROUTE
+ */
+app.post('/reset-database', (req, res) => {
+  const sql = 'CALL sp_reset_rocket_event_mgt();';
+
+  const executor = db.pool || db;
+
+  executor.query(sql, (err) => {
+    if (err) {
+      console.error("RESET FAILED:", err);
+      return res.status(500).send("Reset failed.");
+    }
+
+    console.log("DATABASE RESET COMPLETED.");
+
+    const redirectPage = req.body.redirectTo || '/';
+    res.redirect(redirectPage);
+  });
+});
+
+
 
 /*
     LISTENER

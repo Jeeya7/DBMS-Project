@@ -44,3 +44,18 @@
 .header-nav .nav-item a:hover{
     background-color: #0077ff;
 }
+
+.reset-btn {
+  background-color: #cc0000;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.reset-btn:hover {
+  background-color: #990000;
+}
+
