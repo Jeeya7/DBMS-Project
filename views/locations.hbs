@@ -58,6 +58,7 @@
 <h3>Update Location Details</h3>
 <form action="/update-location" method="POST" class="add-form">
 
+
   <label for="locationId">Select Location ID:</label>
   <select id="locationId" name="locationId" required>
     <option value="">-- Select a Location ID --</option>
@@ -67,7 +68,8 @@
     </option>
     {{/each}}
   </select>
-
+  <label for="locationName"> Location Name:</label>
+  <input type="text" id="locationName" name="locationName" placeholder="Enter Location name" required>
   <label for="address">Address</label>
   <input type="text" id="address" name="address" required>
 
