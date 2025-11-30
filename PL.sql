@@ -1,4 +1,13 @@
 ----------------------------------------------------------------------
+-- Citation Information
+-- Title: Rocket Event Management System
+-- Author: Jiya Pradhan & Faith Nambasa
+-- Date: 11/29/2025
+-- Description: Stored Procedures and Functions for Rocket Event Management System
+-- Source: Exported from PhpMyAdmin
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
 -- Procedure and Function definitions for Rocket Event Management 
 -- Exported From PhpMyAdmin 
 ----------------------------------------------------------------------
